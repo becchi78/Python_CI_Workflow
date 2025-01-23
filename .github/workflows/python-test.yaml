@@ -7,7 +7,7 @@ on:
       - "fix/*"
 
 jobs:
-  test:
+  python-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,12 +43,12 @@ jobs:
         run: |
           pytest tests/ -v
 
-    - name: test results
-      if: always()
-      run: |
-        if [[ "${{ steps.flake8.outcome }}" == "failure" ]] || \
-          [[ "${{ steps.mypy.outcome }}" == "failure" ]] || \
-          [[ "${{ steps.pytest.outcome }}" == "failure" ]]; then
-          echo "test failed"
-          exit 1
-        fi
+      - name: test results
+        if: always()
+        run: |
+          if [[ "${{ steps.flake8.outcome }}" == "failure" ]] || \
+            [[ "${{ steps.mypy.outcome }}" == "failure" ]] || \
+            [[ "${{ steps.pytest.outcome }}" == "failure" ]]; then
+            echo "test failed"
+            exit 1
+          fi
