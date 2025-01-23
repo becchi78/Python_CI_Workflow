@@ -7,7 +7,7 @@ on:
       - "fix/*"
 
 jobs:
-  python_test:
+  test:
     runs-on: ubuntu-latest
 
     steps:
