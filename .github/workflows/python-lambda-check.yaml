@@ -1,4 +1,4 @@
-name: Python Lambda Check
+name: Python Check
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - "fix/*"
 
 jobs:
-  test:
+  python-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,17 +25,30 @@ jobs:
           pip install -r tests/requirements.txt
 
       - name: Lint with flake8
+        id: flake8
         continue-on-error: true
         run: |
           # PEP 8 style guide checking
           flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics
 
       - name: Static type checking with mypy
+        id: mypy
         continue-on-error: true
         run: |
           mypy functions/ --strict
 
       - name: Run tests with pytest
+        id: pytest
         continue-on-error: true
         run: |
           pytest tests/ -v
+
+    - name: Check test results
+      if: always()
+      run: |
+        if [[ "${{ steps.flake8.outcome }}" == "failure" ]] || \
+          [[ "${{ steps.mypy.outcome }}" == "failure" ]] || \
+          [[ "${{ steps.pytest.outcome }}" == "failure" ]]; then
+          echo "checks failed"
+          exit 1
+        fi
