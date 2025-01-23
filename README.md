@@ -15,7 +15,7 @@
 
 ## プロジェクト構造
 
-```
+```text
 /
 ├── .github/
 │   └── workflows/
