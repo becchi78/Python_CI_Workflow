@@ -48,6 +48,14 @@ jobs:
             echo "error=pytest check failed" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check coverage threshold
+        continue-on-error: true
+        id: coverage
+        run: |
+          if ! coverage report --fail-under=80; then
+            echo "error=Coverage is below 80%" >> $GITHUB_OUTPUT
+          fi
+
       - name: test results
         if: always()
         run: |
@@ -63,6 +71,10 @@ jobs:
 
           if [[ "${{ steps.pytest.outputs.error }}" ]]; then
             failed_steps+=("${{ steps.pytest.outputs.error }}")
+          fi
+
+          if [[ "${{ steps.coverage.outputs.error }}" ]]; then
+            failed_steps+=("${{ steps.coverage.outputs.error }}")
           fi
 
           if [ ${#failed_steps[@]} -ne 0 ]; then
