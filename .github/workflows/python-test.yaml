@@ -40,20 +40,22 @@ jobs:
             echo "error=mypy check failed" >> $GITHUB_OUTPUT
           fi
 
-      - name: Run tests with pytest and coverage
+      - name: Run tests with pytest
         continue-on-error: true
         id: pytest
         run: |
-          if ! pytest tests/; then
+          if ! pytest tests/ -v; then
             echo "error=pytest check failed" >> $GITHUB_OUTPUT
           fi
 
       - name: Check coverage threshold
-        if: always()
         continue-on-error: true
         id: coverage
         run: |
-          coverage report --fail-under=80 || echo "error=Coverage is below 80%" >> $GITHUB_OUTPUT
+          coverage run -m pytest tests/
+          if ! coverage report --fail-under=80; then
+            echo "error=Coverage is below 80%" >> $GITHUB_OUTPUT
+          fi
 
       - name: test results
         if: always()
