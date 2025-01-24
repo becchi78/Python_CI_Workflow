@@ -1,80 +1,14 @@
-"""
-Lambda function to process events from various sources.
-"""
-from typing import Any, Dict
-import json
-import logging
+from typing import Dict, Any
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+def add_numbers(a: int,b: int) -> int:  # flake8: E231 - missing whitespace after comma
+    x=1  # flake8: E225 - missing whitespace around operator
+    return a+b  # flake8: E226 - missing whitespace around arithmetic operator
 
-def validate_event(event: Dict[str, Any]) -> bool:
-    """
-    Validates the incoming event data.
-    
-    Args:
-        event: The event data to validate
-        
-    Returns:
-        bool: True if the event is valid, False otherwise
-    """
-    required_fields = ['userId', 'eventType', 'timestamp']
-    return all(field in event for field in required_fields)
+def process_data(data: Dict[str, Any]):  # mypy: missing return type annotation
+    if data["value"] > 0:
+        return "positive"
+    else:
+        return "negative"
 
-def process_event(event: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Processes the event data and performs necessary transformations.
-    
-    Args:
-        event: The event data to process
-        
-    Returns:
-        Dict containing the processed event data
-    """
-    if not validate_event(event):
-        raise ValueError("Invalid event format")
-    
-    processed_event = {
-        'user_id': event['userId'],
-        'event_type': event['eventType'],
-        'timestamp': event['timestamp'],
-        'processed_at': event.get('processedAt', ''),
-        'metadata': event.get('metadata', {})
-    }
-    
-    return processed_event
-
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    """
-    AWS Lambda handler function.
-    
-    Args:
-        event: The AWS Lambda event
-        context: The AWS Lambda context
-        
-    Returns:
-        Dict containing the response
-    """
-    try:
-        logger.info("Received event: %s", json.dumps(event))
-        
-        processed_result = process_event(event)
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps(processed_result)
-        }
-        
-    except ValueError as e:
-        logger.error("Validation error: %s", str(e))
-        return {
-            'statusCode': 400,
-            'body': json.dumps({'error': str(e)})
-        }
-        
-    except Exception as e:
-        logger.error("Unexpected error: %s", str(e))
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': 'Internal server error'})
-        }
+def unreachable_function():  # pytest-cov: function never called
+    return "this function is never used"
