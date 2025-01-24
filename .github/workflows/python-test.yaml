@@ -27,25 +27,46 @@ jobs:
       - name: Lint with flake8
         id: flake8
         run: |
-          # PEP 8 style guide checking
-          flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics || echo "failed=true" >> $GITHUB_OUTPUT
+          if ! flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics; then
+            echo "error=Lint check failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: Static type checking with mypy
         id: mypy
         run: |
-          mypy functions/ --strict || echo "failed=true" >> $GITHUB_OUTPUT
+          if ! mypy functions/ --strict; then
+            echo "error=Type check failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: Run tests with pytest
         id: pytest
         run: |
-          pytest tests/ -v || echo "failed=true" >> $GITHUB_OUTPUT
+          if ! pytest tests/ -v; then
+            echo "error=Unit tests failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: test results
         if: always()
         run: |
-          if [[ "${{ steps.flake8.outputs.failed }}" == "true" ]] || \
-             [[ "${{ steps.mypy.outputs.failed }}" == "true" ]] || \
-             [[ "${{ steps.pytest.outputs.failed }}" == "true" ]]; then
-            echo "One or more tests failed"
+          failed_steps=()
+          
+          if [[ "${{ steps.flake8.outcome }}" == "failure" ]]; then
+            failed_steps+=("Flake8: ${{ steps.flake8.outputs.error }}")
+          fi
+          
+          if [[ "${{ steps.mypy.outcome }}" == "failure" ]]; then
+            failed_steps+=("Mypy: ${{ steps.mypy.outputs.error }}")
+          fi
+          
+          if [[ "${{ steps.pytest.outcome }}" == "failure" ]]; then
+            failed_steps+=("Pytest: ${{ steps.pytest.outputs.error }}")
+          fi
+          
+          if [ ${#failed_steps[@]} -ne 0 ]; then
+            echo "Following checks failed:"
+            printf '%s\n' "${failed_steps[@]}"
             exit 1
           fi
