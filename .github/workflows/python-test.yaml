@@ -29,26 +29,26 @@ jobs:
         continue-on-error: true
         run: |
           # PEP 8 style guide checking
-          flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics
+          flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics || echo "::set-output name=failed::true"
 
       - name: Static type checking with mypy
         id: mypy
         continue-on-error: true
         run: |
-          mypy functions/ --strict
+          mypy functions/ --strict || echo "::set-output name=failed::true"
 
       - name: Run tests with pytest
         id: pytest
         continue-on-error: true
         run: |
-          pytest tests/ -v
+          pytest tests/ -v || echo "::set-output name=failed::true"
 
       - name: test results
         if: always()
         run: |
-          if [[ "${{ steps.flake8.outcome }}" == "failure" ]] || \
-            [[ "${{ steps.mypy.outcome }}" == "failure" ]] || \
-            [[ "${{ steps.pytest.outcome }}" == "failure" ]]; then
-            echo "test failed"
+          if [[ "${{ steps.flake8.outputs.failed }}" == "true" ]] || \
+             [[ "${{ steps.mypy.outputs.failed }}" == "true" ]] || \
+             [[ "${{ steps.pytest.outputs.failed }}" == "true" ]]; then
+            echo "One or more tests failed"
             exit 1
           fi
