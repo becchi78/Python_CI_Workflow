@@ -26,22 +26,19 @@ jobs:
 
       - name: Lint with flake8
         id: flake8
-        continue-on-error: true
         run: |
           # PEP 8 style guide checking
-          flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics || echo "::set-output name=failed::true"
+          flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics || echo "failed=true" >> $GITHUB_OUTPUT
 
       - name: Static type checking with mypy
         id: mypy
-        continue-on-error: true
         run: |
-          mypy functions/ --strict || echo "::set-output name=failed::true"
+          mypy functions/ --strict || echo "failed=true" >> $GITHUB_OUTPUT
 
       - name: Run tests with pytest
         id: pytest
-        continue-on-error: true
         run: |
-          pytest tests/ -v || echo "::set-output name=failed::true"
+          pytest tests/ -v || echo "failed=true" >> $GITHUB_OUTPUT
 
       - name: test results
         if: always()
