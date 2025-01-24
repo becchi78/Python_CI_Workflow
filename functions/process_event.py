@@ -1,14 +1,11 @@
+"""Process event module."""
 from typing import Dict, Any
 
-def add_numbers(a: int,b: int) -> int:  # flake8: E231 - missing whitespace after comma
-    x=1  # flake8: E225 - missing whitespace around operator
-    return a+b  # flake8: E226 - missing whitespace around arithmetic operator
+def add_numbers(a: int,b: int) -> int:  # E231: missing whitespace after comma
+    return a+b  # E226: missing whitespace around operator
 
-def process_data(data: Dict[str, Any]):  # mypy: missing return type annotation
+def process_data(data: Dict[str, Any]):  # no-untyped-def: missing return type
+    """Process input data."""
     if data["value"] > 0:
-        return "positive"
-    else:
-        return "negative"
-
-def unreachable_function():  # pytest-cov: function never called
-    return "this function is never used"
+        return data["value"]   # E201: whitespace after '{'
+    return 0
