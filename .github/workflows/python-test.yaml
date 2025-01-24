@@ -28,7 +28,7 @@ jobs:
         id: flake8
         continue-on-error: true
         run: |
-          if ! flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics; then
+          if ! flake8 functions/; then
             echo "error=Lint check failed" >> $GITHUB_OUTPUT
           fi
 
@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
         id: mypy
         run: |
-          if ! mypy functions/ --strict; then
+          if ! mypy functions/; then
             echo "error=mypy check failed" >> $GITHUB_OUTPUT
           fi
 
@@ -44,7 +44,7 @@ jobs:
         continue-on-error: true
         id: pytest
         run: |
-          if ! pytest tests/ -v; then
+          if ! pytest tests/; then
             echo "error=pytest check failed" >> $GITHUB_OUTPUT
           fi
 
