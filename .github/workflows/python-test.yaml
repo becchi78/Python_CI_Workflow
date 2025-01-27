@@ -52,7 +52,9 @@ jobs:
         continue-on-error: true
         id: coverage
         run: |
-          coverage report --fail-under=80 || echo "error=Coverage is below 80%" >> $GITHUB_OUTPUT
+          if ! coverage report --fail-under=80; then
+            echo "error=Coverage is below 80%" >> $GITHUB_OUTPUT
+          fi
 
       - name: test results
         if: always()
