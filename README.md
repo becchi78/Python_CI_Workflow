@@ -1,6 +1,6 @@
-# イベント処理 Lambda 関数
+# Python CI Workflow
 
-イベントを処理する AWS Lambda 関数と自動テスト・コード品質チェックの環境です。
+このプロジェクトは、イベント処理を行う AWS Lambda 関数とその自動テスト・コード品質チェックの環境を提供します。
 
 ## 概要
 
@@ -19,13 +19,18 @@
 /
 ├── .github/
 │   └── workflows/
-│       └── python-lambda-check.yml  # CI パイプラインの定義
+│       └── python-test.yaml        # CI パイプラインの定義
 ├── functions/
-│   └── process_event.py            # Lambda 関数本体
+│   └── __init__.py                 # パッケージ初期化ファイル
 ├── tests/
+│   ├── requirements.txt            # テスト依存関係
+│   ├── requirements_test_tools.txt # テストツール依存関係
 │   └── test_process_event.py       # テストコード
+├── .gitignore                      # Git 無視ファイル
+├── pytest.ini                      # pytest 設定ファイル
 ├── requirements.txt                # 関数の依存関係
-└── requirements-dev.txt           # テストライブラリ
+├── setup.cfg                       # flake8 と mypy の設定ファイル
+└── README.md                       # このREADME
 ```
 
 ## 開発環境のセットアップ
@@ -49,10 +54,10 @@ cd [リポジトリ名]
 
 ```bash
 # テストライブラリのインストール（flake8, pytest, mypy）
-pip install -r requirements-dev.txt
+pip install -r tests/requirements_test_tools.txt
 
 # 関数の依存関係のインストール
-pip install -r requirements.txt
+pip install -r tests/requirements.txt
 ```
 
 ## 開発ガイド
@@ -63,13 +68,13 @@ pip install -r requirements.txt
 
 ```bash
 # PEP 8 スタイルチェック
-flake8 functions/ --count --max-complexity=10 --max-line-length=100 --statistics
+flake8 functions/
 
 # 静的型チェック
-mypy functions/ --strict
+mypy functions/
 
 # ユニットテスト
-pytest tests/ -v
+pytest tests/
 ```
 
 ### GitHub Actions
@@ -84,41 +89,3 @@ pytest tests/ -v
 1. コードスタイル（flake8）
 2. 静的型チェック（mypy）
 3. ユニットテスト（pytest）
-
-### 新機能の追加手順
-
-1. 新しいブランチの作成：
-
-```bash
-git checkout -b feature/機能名
-```
-
-2. 変更を加え、ローカルでテストを実行
-3. 変更をコミット
-4. GitHub にプッシュしてプルリクエストを作成
-
-## Lambda 関数の使用方法
-
-Lambda 関数は以下の形式のイベントを受け付けます：
-
-```json
-{
-  "userId": "12345",
-  "eventType": "click",
-  "timestamp": "2024-01-21T10:00:00Z",
-  "metadata": {
-    "page": "home"
-  }
-}
-```
-
-### エラーハンドリング
-
-- バリデーションエラー：ステータスコード 400 が返却されます
-- 内部エラー：ステータスコード 500 が返却されます
-
-## 注意事項
-
-- このプロジェクトは Python 3.12 で動作確認しています
-- 開発時は必ずテストライブラリ（requirements-dev.txt）をインストールしてください
-- コミット前に必ずローカルでテストを実行してください
